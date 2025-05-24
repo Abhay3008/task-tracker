@@ -70,10 +70,16 @@ All tasks are saved in a local tasks.json file in the same directory.
 
 ## Build
 To build the binary:
-
 ```bash
 go build -o task-tracker
 ```
+
+To build and run with Docker:
+```bash
+docker build -t task-tracker .
+docker run --rm -v $(pwd)/tasks.json:/app/tasks.json task-tracker list
+```
+
 ### Example
 ```bash
 $ task-tracker add "Finish writing README"
