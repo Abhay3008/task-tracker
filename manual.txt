@@ -1,0 +1,25 @@
+Usage:
+  task-tracker add "Task description"
+    Adds a new task. Example:
+    $ task-tracker add "Buy groceries"
+
+  task-tracker update <id> "New description"
+    Updates an existing task.
+
+  task-tracker delete <id>
+    Deletes a task by ID.
+
+  task-tracker mark-in-progress <id>
+    Marks a task as in progress.
+
+  task-tracker mark-done <id>
+    Marks a task as done.
+
+  task-tracker list
+    Lists all tasks.
+
+  task-tracker list <status>
+    Lists tasks filtered by status: todo, in-progress, done.
+
+  task-tracker help
+    Displays this help message.

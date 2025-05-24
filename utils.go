@@ -323,5 +323,10 @@ func PrintMinorseparator() {
 }
 
 func Help() {
-	fmt.Println("this is help!!")
+	data, err := os.ReadFile("manual.txt")
+	if err != nil {
+		fmt.Println("Error reading help file:", err)
+		return
+	}
+	fmt.Println(string(data))
 }
