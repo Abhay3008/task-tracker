@@ -199,6 +199,99 @@ func Updatetask(operation string, id int, description ...string) error {
 	return errors.New("Invalid operation:" + operation)
 }
 
+func ShowAllTasks() {
+	tasklist := Loadjson()
+	PrintMajorseparator()
+	fmt.Println("To Do Tasks")
+	PrintMajorseparator()
+	if len(tasklist.Todo) < 1 {
+		fmt.Println("No Task for now, Take some Rest!!")
+	}
+	for k, v := range tasklist.Todo {
+		fmt.Printf(" ID: %v\n Description: %v\n", v.Id, v.Description)
+		if k != len(tasklist.Todo)-1 {
+			PrintMinorseparator()
+		}
+	}
+	fmt.Println()
+
+	PrintMajorseparator()
+	fmt.Println("In Progress Tasks")
+	PrintMajorseparator()
+	if len(tasklist.Todo) < 1 {
+		fmt.Println("No Task for now, Take some Rest!!")
+	}
+	for k, v := range tasklist.Inprogress {
+		fmt.Printf(" ID: %v\n Description: %v\n", v.Id, v.Description)
+		if k != len(tasklist.Inprogress)-1 {
+			PrintMinorseparator()
+		}
+	}
+	fmt.Println()
+
+	PrintMajorseparator()
+	fmt.Println("Completed Tasks")
+	PrintMajorseparator()
+	if len(tasklist.Done) < 1 {
+		fmt.Println("No Task found!!")
+	}
+	for k, v := range tasklist.Done {
+		fmt.Printf(" ID: %v\n Description: %v\n", v.Id, v.Description)
+		if k != len(tasklist.Done)-1 {
+			PrintMinorseparator()
+		}
+	}
+
+}
+
+func ShowtodoTask() {
+	tasklist := Loadjson()
+	PrintMajorseparator()
+	fmt.Println("To Do Tasks")
+	PrintMajorseparator()
+	if len(tasklist.Todo) < 1 {
+		fmt.Println("No Task for now, Take some Rest!!")
+	}
+	for k, v := range tasklist.Todo {
+		fmt.Printf(" ID: %v\n Description: %v\n", v.Id, v.Description)
+		if k != len(tasklist.Todo)-1 {
+			PrintMinorseparator()
+		}
+	}
+}
+
+func ShowInProgressTask() {
+	tasklist := Loadjson()
+	PrintMajorseparator()
+	fmt.Println("In Progress Tasks")
+	PrintMajorseparator()
+	if len(tasklist.Todo) < 1 {
+		fmt.Println("No Task for now, Take some Rest!!")
+	}
+	for k, v := range tasklist.Inprogress {
+		fmt.Printf(" ID: %v\n Description: %v\n", v.Id, v.Description)
+		if k != len(tasklist.Inprogress)-1 {
+			PrintMinorseparator()
+		}
+	}
+	fmt.Println()
+}
+func ShowDoneTasks() {
+	tasklist := Loadjson()
+	PrintMajorseparator()
+	fmt.Println("Completed Tasks")
+	PrintMajorseparator()
+	if len(tasklist.Done) < 1 {
+		fmt.Println("No Task found!!")
+	}
+	for k, v := range tasklist.Done {
+		fmt.Printf(" ID: %v\n Description: %v\n", v.Id, v.Description)
+		if k != len(tasklist.Done)-1 {
+			PrintMinorseparator()
+		}
+	}
+}
+
 func Savejson(tasklist Tasklist) bool {
 
 	newfile, err := os.Create(file)
@@ -218,6 +311,14 @@ func Savejson(tasklist Tasklist) bool {
 
 func Error(msg string) {
 	fmt.Printf("**Error: %v\n", msg)
+}
+
+func PrintMajorseparator() {
+	fmt.Println("---------------")
+}
+
+func PrintMinorseparator() {
+	fmt.Println("-------")
 }
 
 func Help() {

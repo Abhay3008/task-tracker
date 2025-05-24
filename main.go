@@ -29,8 +29,8 @@ func main() {
 		MarkInProgress(args[1:])
 	case "mark-done":
 		MarkDone(args[1:])
-	// case "list":
-	// 	List(args[1:])
+	case "list":
+		List(args[1:])
 	case "help":
 		Help()
 	default:
@@ -159,4 +159,27 @@ func MarkDone(args []string) {
 		Error("Unable to mark-done Task, Please retry!")
 	}
 	fmt.Printf("Task moved to Done (ID: %d)\n", id)
+}
+
+func List(args []string) {
+	if len(args) > 1 {
+		Error("Too many arguements for command list")
+		Help()
+		os.Exit(1)
+	}
+	if len(args) == 0 {
+		ShowAllTasks()
+	}
+
+	switch args[0] {
+	case "todo":
+		ShowtodoTask()
+	case "in-progress":
+		ShowInProgressTask()
+	case "done":
+		ShowDoneTasks()
+	default:
+		fmt.Printf("Invalid option: %v for command list\n", args[0])
+		Help()
+	}
 }
