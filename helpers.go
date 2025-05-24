@@ -136,6 +136,7 @@ func List(args []string) {
 	}
 	if len(args) == 0 {
 		ShowAllTasks()
+		os.Exit(0)
 	}
 
 	switch args[0] {
