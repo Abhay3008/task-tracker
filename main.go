@@ -8,7 +8,11 @@ import (
 func main() {
 
 	args := os.Args[1:]
-
+	// fmt.Println(args)
+	if len(args) < 1 {
+		Help()
+		os.Exit(0)
+	}
 	switch args[0] {
 
 	case "add":
