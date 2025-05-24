@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -25,12 +27,12 @@ type Tasklist struct {
 	TotalId    int    `json:"totalid"`
 }
 
-func main() {
-	// fmt.Println(Addtask("test task"))
-	// fmt.Println(Removetask(2))
-	fmt.Println(Updatetask("updateInProgress", 3))
-	// fmt.Println(data)
-}
+// func main() {
+// 	// fmt.Println(Addtask("test task"))
+// 	// fmt.Println(Removetask(2))
+// 	fmt.Println(Updatetask("updateInProgress", 3))
+// 	// fmt.Println(data)
+// }
 
 func Loadjson() Tasklist {
 	_, err := os.Stat(file)
@@ -49,7 +51,7 @@ func Loadjson() Tasklist {
 	}
 }
 
-func Addtask(description string) bool {
+func Addtask(description string) (int, error) {
 	tasklist := Loadjson()
 	currtime := time.Now().Format("2006-01-02 15:04:05")
 	newtask := Task{
@@ -61,36 +63,48 @@ func Addtask(description string) bool {
 	tasklist.Todo = append(tasklist.Todo, newtask)
 	tasklist.TotalId++
 	if Savejson(tasklist) {
-		return true
+		return newtask.Id, nil
 	}
-	return false
+	return 0, errors.New("Got some Internal Error while adding Task!!")
 }
 
-func Removetask(id int) bool {
+func Removetask(id int) error {
 	tasklist := Loadjson()
 
 	for k, v := range tasklist.Todo {
 		if id == v.Id {
 			tasklist.Todo = append(tasklist.Todo[:k], tasklist.Todo[k+1:]...)
-			return Savejson(tasklist)
+			if Savejson(tasklist) {
+				return nil
+			} else {
+				return errors.New("internal error occured while updating json file")
+			}
 		}
 	}
 	for k, v := range tasklist.Inprogress {
 		if id == v.Id {
 			tasklist.Inprogress = append(tasklist.Inprogress[:k], tasklist.Inprogress[k+1:]...)
-			return Savejson(tasklist)
+			if Savejson(tasklist) {
+				return nil
+			} else {
+				return errors.New("internal error occured while updating json file")
+			}
 		}
 	}
 	for k, v := range tasklist.Done {
 		if id == v.Id {
 			tasklist.Done = append(tasklist.Done[:k], tasklist.Done[k+1:]...)
-			return Savejson(tasklist)
+			if Savejson(tasklist) {
+				return nil
+			} else {
+				return errors.New("internal error occured while updating json file")
+			}
 		}
 	}
-	return false
+	return errors.New("Unable to find task with id:" + strconv.Itoa(id) + "in task list!!")
 }
 
-func Updatetask(operation string, id int, description ...string) bool {
+func Updatetask(operation string, id int, description ...string) error {
 	tasklist := Loadjson()
 	desc := ""
 	if len(description) > 0 {
@@ -100,19 +114,31 @@ func Updatetask(operation string, id int, description ...string) bool {
 		for k, v := range tasklist.Todo {
 			if id == v.Id {
 				tasklist.Todo[k].Description = desc
-				return Savejson(tasklist)
+				if Savejson(tasklist) {
+					return nil
+				} else {
+					return errors.New("internal error occured while updating json file")
+				}
 			}
 		}
 		for k, v := range tasklist.Inprogress {
 			if id == v.Id {
 				tasklist.Inprogress[k].Description = desc
-				return Savejson(tasklist)
+				if Savejson(tasklist) {
+					return nil
+				} else {
+					return errors.New("internal error occured while updating json file")
+				}
 			}
 		}
 		for k, v := range tasklist.Done {
 			if id == v.Id {
 				tasklist.Done[k].Description = desc
-				return Savejson(tasklist)
+				if Savejson(tasklist) {
+					return nil
+				} else {
+					return errors.New("internal error occured while updating json file")
+				}
 			}
 		}
 	} else if operation == "updateInProgress" {
@@ -122,11 +148,15 @@ func Updatetask(operation string, id int, description ...string) bool {
 				Removetask(id)
 				tasklist.Todo = append(tasklist.Todo[:k], tasklist.Todo[k+1:]...)
 				tasklist.Inprogress = append(tasklist.Inprogress, temp)
-				return Savejson(tasklist)
+				if Savejson(tasklist) {
+					return nil
+				} else {
+					return errors.New("internal error occured while updating json file")
+				}
 			}
 		}
 		fmt.Printf("Unable to find task with id: %d in in-progress list!!", id)
-		return false
+		return errors.New("Unable to find task with id:" + strconv.Itoa(id) + "in in-progress list!!")
 	} else if operation == "updateDone" {
 		for k, v := range tasklist.Todo {
 			if id == v.Id {
@@ -134,7 +164,11 @@ func Updatetask(operation string, id int, description ...string) bool {
 				Removetask(id)
 				tasklist.Todo = append(tasklist.Todo[:k], tasklist.Todo[k+1:]...)
 				tasklist.Done = append(tasklist.Done, temp)
-				return Savejson(tasklist)
+				if Savejson(tasklist) {
+					return nil
+				} else {
+					return errors.New("internal error occured while updating task")
+				}
 			}
 		}
 		for k, v := range tasklist.Inprogress {
@@ -143,18 +177,26 @@ func Updatetask(operation string, id int, description ...string) bool {
 				Removetask(id)
 				tasklist.Inprogress = append(tasklist.Inprogress[:k], tasklist.Inprogress[k+1:]...)
 				tasklist.Done = append(tasklist.Done, temp)
-				return Savejson(tasklist)
+				if Savejson(tasklist) {
+					return nil
+				} else {
+					return errors.New("internal error occured while updating task")
+				}
 			}
 		}
 		for _, v := range tasklist.Done {
 			if id == v.Id {
 				fmt.Println("Task already marked as Done!!")
-				return false
+				if Savejson(tasklist) {
+					return nil
+				} else {
+					return errors.New("internal error occured while updating task")
+				}
 			}
 		}
 
 	}
-	return false
+	return errors.New("Invalid operation:" + operation)
 }
 
 func Savejson(tasklist Tasklist) bool {
@@ -172,4 +214,12 @@ func Savejson(tasklist Tasklist) bool {
 	io.Writer.Write(newfile, res)
 	newfile.Close()
 	return true
+}
+
+func Error(msg string) {
+	fmt.Printf("**Error: %v\n", msg)
+}
+
+func Help() {
+	fmt.Println("this is help!!")
 }

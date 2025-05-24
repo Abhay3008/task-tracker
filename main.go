@@ -1,48 +1,112 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
+	"log"
 	"os"
+	"strconv"
 )
-
-type Task struct {
-	Id          int    `json:"id"`
-	Description string `json:"description"`
-	CreatedAt   string `json:"createdAt"`
-	UpdatedAt   string `json:"updatedAt"`
-}
-
-type Tasklist struct {
-	Todo       []Task `json:"todo"`
-	Inprogress []Task `json:"inprogress"`
-	Done       []Task `json:"done"`
-	TotalId    int    `json:"totalid"`
-}
 
 func main() {
 
 	// var command string
+	// var c string
+	args := os.Args[1:]
+	// fmt.Scan(&command, &c)
 
-	// fmt.Scan(&command)
+	// fmt.Printf("%v || %v", command, c)
+	// fmt.Printf("%v", args)
 
-	var list Tasklist
-	task := Task{
-		Id:          1,
-		Description: "temp task",
-		CreatedAt:   "20250506223809",
-		UpdatedAt:   "20250506223809",
+	switch args[0] {
+
+	case "add":
+		Add(args[1:])
+	case "update":
+		Update(args[1:])
+	case "delete":
+		Delete(args[1:])
+	// case "mark-in-progress":
+	// 	MarkInProgress(args[1:])
+	// case "mark-done":
+	// 	MarkDone(args[1:])
+	// case "list":
+	// 	List(args[1:])
+	case "help":
+		Help()
+	default:
+		fmt.Printf("Invalid option: %v\n", args[0])
+		Help()
 	}
-	fmt.Println(task)
-	list.Todo = append(list.Todo, task)
-	fmt.Println(list.Todo)
-	res, _ := json.MarshalIndent(list, "", "\t")
-	fmt.Printf("%s\n", res)
 
-	file, _ := os.Create("./tasks.json")
-	io.Writer.Write(file, res)
-	fmt.Printf("file has been created: %T", res)
-	file.Close()
+}
+
+func Add(args []string) {
+	if len(args) > 1 {
+		Error("Too many arguements for add")
+		Help()
+		os.Exit(1)
+	} else if len(args) < 1 {
+		Error("add requires an arguement")
+		Help()
+		os.Exit(1)
+	}
+	id, err := Addtask(args[0])
+	if err != nil {
+		log.Println(err)
+		Error("Unable to add task to the to-do list, Please retry!!")
+		os.Exit(1)
+	}
+	fmt.Printf("Task added successfully (ID: %d)\n", id)
+
+}
+
+func Update(args []string) {
+	if len(args) > 2 {
+		Error("Too many arguements for update")
+		Help()
+		os.Exit(1)
+	} else if len(args) < 2 {
+		Error("update requires 2 arguement")
+		Help()
+		os.Exit(1)
+	}
+	id, err := strconv.Atoi(args[0])
+	if err != nil {
+		log.Println(err)
+		Error("Got error while converting id, Please retry with appropriate arguements.")
+		Help()
+		os.Exit(1)
+	}
+	err = Updatetask("update", id, args[1])
+	if err != nil {
+		log.Println(err)
+		Error("Unable to update Task, Please retry!")
+	}
+	fmt.Printf("Task updated successfully (ID: %d)\n", id)
+}
+
+func Delete(args []string) {
+	if len(args) > 1 {
+		Error("Too many arguements for update")
+		Help()
+		os.Exit(1)
+	} else if len(args) < 1 {
+		Error("update requires an arguement")
+		Help()
+		os.Exit(1)
+	}
+	id, err := strconv.Atoi(args[0])
+	if err != nil {
+		log.Println(err)
+		Error("Got error while converting id, Please retry with appropriate arguements.")
+		Help()
+		os.Exit(1)
+	}
+	err = Removetask(id)
+	if err != nil {
+		log.Println(err)
+		Error("Unable to remove Task, Please retry!")
+	}
+	fmt.Printf("Task removed successfully (ID: %d)\n", id)
 
 }
