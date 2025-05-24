@@ -25,10 +25,10 @@ func main() {
 		Update(args[1:])
 	case "delete":
 		Delete(args[1:])
-	// case "mark-in-progress":
-	// 	MarkInProgress(args[1:])
-	// case "mark-done":
-	// 	MarkDone(args[1:])
+	case "mark-in-progress":
+		MarkInProgress(args[1:])
+	case "mark-done":
+		MarkDone(args[1:])
 	// case "list":
 	// 	List(args[1:])
 	case "help":
@@ -109,4 +109,54 @@ func Delete(args []string) {
 	}
 	fmt.Printf("Task removed successfully (ID: %d)\n", id)
 
+}
+
+func MarkInProgress(args []string) {
+	if len(args) > 1 {
+		Error("Too many arguements for mark-in-progress")
+		Help()
+		os.Exit(1)
+	} else if len(args) < 1 {
+		Error("mark-in-progress requires an arguement")
+		Help()
+		os.Exit(1)
+	}
+	id, err := strconv.Atoi(args[0])
+	if err != nil {
+		log.Println(err)
+		Error("Got error while converting id, Please retry with appropriate arguements.")
+		Help()
+		os.Exit(1)
+	}
+	err = Updatetask("updateInProgress", id)
+	if err != nil {
+		log.Println(err)
+		Error("Unable to mark-in-progress Task, Please retry!")
+	}
+	fmt.Printf("Task moved to in-progress (ID: %d)\n", id)
+}
+
+func MarkDone(args []string) {
+	if len(args) > 1 {
+		Error("Too many arguements for mark-done")
+		Help()
+		os.Exit(1)
+	} else if len(args) < 1 {
+		Error("mark-done requires an arguement")
+		Help()
+		os.Exit(1)
+	}
+	id, err := strconv.Atoi(args[0])
+	if err != nil {
+		log.Println(err)
+		Error("Got error while converting id, Please retry with appropriate arguements.")
+		Help()
+		os.Exit(1)
+	}
+	err = Updatetask("updateDone", id)
+	if err != nil {
+		log.Println(err)
+		Error("Unable to mark-done Task, Please retry!")
+	}
+	fmt.Printf("Task moved to Done (ID: %d)\n", id)
 }
