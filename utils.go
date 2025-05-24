@@ -323,10 +323,22 @@ func PrintMinorseparator() {
 }
 
 func Help() {
-	data, err := os.ReadFile("manual.txt")
-	if err != nil {
-		fmt.Println("Error reading help file:", err)
-		return
-	}
-	fmt.Println(string(data))
+	var helpText = `
+Usage:
+  task-tracker add "Task description"
+    Adds a new task. Example:
+    $ task-tracker add "Buy groceries"
+
+  task-tracker update <id> "New description"
+  task-tracker delete <id>
+  task-tracker mark-in-progress <id>
+  task-tracker mark-done <id>
+  task-tracker list
+  task-tracker list <status>
+    (todo, in-progress, done)
+
+  task-tracker help
+    Displays this help message.
+`
+	fmt.Println(helpText)
 }
