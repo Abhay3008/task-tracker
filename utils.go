@@ -26,8 +26,9 @@ type Tasklist struct {
 }
 
 func main() {
-	fmt.Println(Addtask("test task"))
-	fmt.Println(Removetask(2))
+	// fmt.Println(Addtask("test task"))
+	// fmt.Println(Removetask(2))
+	fmt.Println(Updatetask("updateInProgress", 3))
 	// fmt.Println(data)
 }
 
@@ -85,6 +86,73 @@ func Removetask(id int) bool {
 			tasklist.Done = append(tasklist.Done[:k], tasklist.Done[k+1:]...)
 			return Savejson(tasklist)
 		}
+	}
+	return false
+}
+
+func Updatetask(operation string, id int, description ...string) bool {
+	tasklist := Loadjson()
+	desc := ""
+	if len(description) > 0 {
+		desc = description[0]
+	}
+	if operation == "update" {
+		for k, v := range tasklist.Todo {
+			if id == v.Id {
+				tasklist.Todo[k].Description = desc
+				return Savejson(tasklist)
+			}
+		}
+		for k, v := range tasklist.Inprogress {
+			if id == v.Id {
+				tasklist.Inprogress[k].Description = desc
+				return Savejson(tasklist)
+			}
+		}
+		for k, v := range tasklist.Done {
+			if id == v.Id {
+				tasklist.Done[k].Description = desc
+				return Savejson(tasklist)
+			}
+		}
+	} else if operation == "updateInProgress" {
+		for k, v := range tasklist.Todo {
+			if id == v.Id {
+				temp := tasklist.Todo[k]
+				Removetask(id)
+				tasklist.Todo = append(tasklist.Todo[:k], tasklist.Todo[k+1:]...)
+				tasklist.Inprogress = append(tasklist.Inprogress, temp)
+				return Savejson(tasklist)
+			}
+		}
+		fmt.Printf("Unable to find task with id: %d in in-progress list!!", id)
+		return false
+	} else if operation == "updateDone" {
+		for k, v := range tasklist.Todo {
+			if id == v.Id {
+				temp := tasklist.Todo[k]
+				Removetask(id)
+				tasklist.Todo = append(tasklist.Todo[:k], tasklist.Todo[k+1:]...)
+				tasklist.Done = append(tasklist.Done, temp)
+				return Savejson(tasklist)
+			}
+		}
+		for k, v := range tasklist.Inprogress {
+			if id == v.Id {
+				temp := tasklist.Inprogress[k]
+				Removetask(id)
+				tasklist.Inprogress = append(tasklist.Inprogress[:k], tasklist.Inprogress[k+1:]...)
+				tasklist.Done = append(tasklist.Done, temp)
+				return Savejson(tasklist)
+			}
+		}
+		for _, v := range tasklist.Done {
+			if id == v.Id {
+				fmt.Println("Task already marked as Done!!")
+				return false
+			}
+		}
+
 	}
 	return false
 }
